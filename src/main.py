@@ -1,36 +1,19 @@
 from pathlib import Path
-from metadatos import leer_exif, obtener_fechas_exif, obtener_fecha_foto
+
+from procesador import(
+    obtener_fotografias, procesar_fotografias
+)
+from interfaz import (
+   mostrar_metadatos,
+   mostrar_fechas_exif,
+   mostrar_fecha_seleccionada
+)
 
 CARPETA_ENTRADA = Path(__file__).resolve().parent.parent / "fotos_entrada"
 
-def mostrar_metadatos(metadatos):
-
-   """Muestra los metadatos EXIF en pantalla."""
-
-   for nombre, valor in metadatos.items():
-      if nombre == "GPSInfo" and isinstance(valor, dict):
-         print("\nGPS: ")
-         for nombre_gps, valor_gps in valor.items():
-            print(f" {nombre_gps}: {valor_gps}")
-
-      else:
-         print(f"{nombre}: {valor}")
-
-def mostrar_fechas_exif(fechas):
-    """Muestra las fechas disponibles en los metadatos EXIF."""
-
-    print("\nFECHAS EXIF")
-    print("-" * 40)
-
-    for nombre, valor in fechas.items():
-
-        if valor is None:
-            print(f"{nombre}: NO DISPONIBLE")
-        else:
-            print(f"{nombre}: {valor}")
 
 def main():
-    fotos = list(CARPETA_ENTRADA.iterdir())
+    fotos = obtener_fotografias(CARPETA_ENTRADA)
 
     if not fotos: 
       print("No hay fotografías en fotos_entrada")
@@ -44,28 +27,20 @@ def main():
     print(f"Foto: {ruta_foto.name}")
     print("=" * 60)
 
-    metadatos = leer_exif(ruta_foto)
+    resultado = procesar_fotografias(ruta_foto)
 
-    if not metadatos:
-       print("La fotografía no contiene metadatos EXIF. ")
-       return
+    if resultado is None:
+       print("La fotografía no contiene metadatos EXIF.")
+
+    metadatos = resultado["metadatos"]
+    fechas = resultado["fechas"]
+    fecha = resultado["fecha"]
 
     mostrar_metadatos(metadatos)
 
-    fechas = obtener_fechas_exif(metadatos)
-
     mostrar_fechas_exif(fechas)
 
-    fecha = obtener_fecha_foto(metadatos)
-
-    print("\nFECHA SELECCIONADA")
-    print("-" * 40)
-
-    if fecha is None:
-        print("Fecha: NO DISPONIBLE")
-    else:
-      print(f"Fecha: {fecha.strftime('%Y-%m-%d %H:%M:%S')}")
-
+    mostrar_fecha_seleccionada(fecha)
 
 if __name__ == "__main__":
     main()
