@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
@@ -38,22 +39,40 @@ def leer_gps(gps_info):
     return gps
 
 
-def obtener_fechas_exif(ruta_foto: Path):
+def obtener_fechas_exif(metadatos):
     """Obtiene las diferentes fechas disponibles en los metadatos EXIF."""
 
-    with Image.open(ruta_foto) as imagen:
-        exif = imagen.getexif()
+    fechas = {
+      "DateTimeOriginal": None,
+      "DateTimeDigitized": None,
+      "DateTime": None,
+    }
+    for etiqueta, valor in metadatos.items():
+      nombre = TAGS.get(etiqueta, etiqueta)
 
-        fechas = {
-            "DateTimeOriginal": None,
-            "DateTimeDigitized": None,
-            "DateTime": None,
-        }
+      if nombre in fechas:
+        fechas[nombre] = valor
 
-        for etiqueta, valor in exif.items():
-            nombre = TAGS.get(etiqueta, etiqueta)
+    return fechas
 
-            if nombre in fechas:
-                fechas[nombre] = valor
+def obtener_fecha_foto(metadatos):
+  """Obtiene la mejor fecha disponible de la totografía."""
 
-        return fechas
+  fechas = obtener_fechas_exif(metadatos)
+
+  prioridad = [
+      "DateTimeOriginal",
+      "DateTimeDigitized",
+      "DateTime"
+  ]
+
+  for nombre in prioridad:
+    valor = fechas[nombre]
+    if valor is None:
+      continue
+    try:
+      return datetime.strptime(valor, "%Y:%m:%d %H:%M:%S")
+    except ValueError:
+      continue
+
+    

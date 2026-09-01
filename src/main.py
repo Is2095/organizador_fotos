@@ -1,5 +1,5 @@
 from pathlib import Path
-from metadatos import leer_exif, obtener_fechas_exif
+from metadatos import leer_exif, obtener_fechas_exif, obtener_fecha_foto
 
 CARPETA_ENTRADA = Path(__file__).resolve().parent.parent / "fotos_entrada"
 
@@ -36,7 +36,7 @@ def main():
       print("No hay fotografías en fotos_entrada")
       return
 
-    ruta_foto = fotos[0]
+    ruta_foto = fotos[1]
 
     print("=" * 60)
     print("INFORMACIÓN EXIF")
@@ -52,9 +52,19 @@ def main():
 
     mostrar_metadatos(metadatos)
 
-    fechas = obtener_fechas_exif(ruta_foto)
+    fechas = obtener_fechas_exif(metadatos)
 
     mostrar_fechas_exif(fechas)
+
+    fecha = obtener_fecha_foto(metadatos)
+
+    print("\nFECHA SELECCIONADA")
+    print("-" * 40)
+
+    if fecha is None:
+        print("Fecha: NO DISPONIBLE")
+    else:
+      print(f"Fecha: {fecha.strftime('%Y-%m-%d %H:%M:%S')}")
 
 
 if __name__ == "__main__":
