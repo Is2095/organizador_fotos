@@ -1,0 +1,17 @@
+# Entorno virtual
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Fotos del proyecto
+fotos_entrada/
+fotos_salida/
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Configuración local
+.env
