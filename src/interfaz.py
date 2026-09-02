@@ -15,7 +15,8 @@ def mostrar_metadatos(metadatos):
 def mostrar_fechas_exif(fechas):
     """Muestra las fechas disponibles en los metadatos EXIF."""
 
-    print("\nFECHAS EXIF")
+    print("FECHAS EXIF")
+    # print("\nFECHAS EXIF")
     print("-" * 40)
 
     for nombre, valor in fechas.items():
@@ -28,10 +29,17 @@ def mostrar_fechas_exif(fechas):
 def mostrar_fecha_seleccionada(fecha):
     """Muestra la fecha seleccionada para la fotografía."""
 
-    print("\nFECHA SELECCIONADA")
+
+    print("=" * 60)
+    print("FECHA SELECCIONADA")
+    # print("\nFECHA SELECCIONADA")
     print("-" * 40)
 
     if fecha is None:
         print("Fecha: NO DISPONIBLE")
+        print("*" * 60)
+        print()
     else:
         print(f"Fecha: {fecha.strftime('%Y-%m-%d %H:%M:%S')}")
+        print("*" * 60)
+        print()
