@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from procesador import(
-    obtener_fotografias, procesar_fotografias
+    obtener_fotografias, procesar_fotografia
 )
 from interfaz import (
    mostrar_metadatos,
@@ -9,7 +9,13 @@ from interfaz import (
    mostrar_fecha_seleccionada
 )
 
+from renombrador import (
+   generar_nombre_disponible,
+   copiar_fotografia
+)
+
 CARPETA_ENTRADA = Path(__file__).resolve().parent.parent / "fotos_entrada"
+CARPETA_SALIDA = Path(__file__).resolve().parent.parent / "fotos_salida"
 
 
 def main():
@@ -18,6 +24,8 @@ def main():
     if not fotos: 
       print("No hay fotografías en fotos_entrada")
       return
+
+    CARPETA_SALIDA.mkdir(exist_ok=True)
 
     for numero, ruta_foto in enumerate(fotos, start=1):
 
@@ -28,17 +36,33 @@ def main():
       print("=" * 60)
       print()
 
-      resultado = procesar_fotografias(ruta_foto)
+      resultado = procesar_fotografia(ruta_foto)
 
-      if resultado is None:
-        print("La fotografía no contiene metadatos EXIF.")
-        print("*" * 60)
-        print()
+      estado = resultado["estado"]
+
+      print(f"Estado: {estado}")
+
+      if estado == "SIN_EXIF":
+        print("\nLa fotografía no contiene metadatos EXIF.")
+        print("-" * 60)
         continue
 
-      # metadatos = resultado["metadatos"]
+      if estado == "SIN_FECHA":
+        print("\nLa fotografía contiene EXIF, pero no tiene una fecha válida.")
+        print("-" * 60)
+        continue
+             
+      tiene_exif = resultado["tiene_exif"]
+
+      if not tiene_exif:
+        print("\nLa fotografía no contiene metadatos EXIF.")
+        print("*" * 60)
+        continue
+
+      metadatos = resultado["metadatos"]
       fechas = resultado["fechas"]
       fecha = resultado["fecha"]
+
 
       # mostrar_metadatos(metadatos)
 
@@ -46,5 +70,24 @@ def main():
 
       mostrar_fecha_seleccionada(fecha)
 
+      nombre_nuevo = generar_nombre_disponible(
+         fecha,
+         ruta_foto.suffix,
+         CARPETA_SALIDA,
+      )
+
+      ruta_destino = copiar_fotografia(
+         ruta_foto,
+         CARPETA_SALIDA,
+         nombre_nuevo
+      )
+
+      print(f"Fotografía copiada: {ruta_destino.name}")
+      print(f"Nuevo nombre: {nombre_nuevo}")
+
+      print("-/-" * 30)
+
 if __name__ == "__main__":
     main()
+
+    

@@ -8,6 +8,7 @@ __pycache__/
 # Fotos del proyecto
 fotos_entrada/
 fotos_salida/
+fotos_prueba/
 /src/metadatos_proceso.py
 
 # Archivos temporales
