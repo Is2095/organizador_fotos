@@ -1,15 +1,18 @@
 from pathlib import Path
 
-from procesador import(
+from .procesador import(
     obtener_fotografias, procesar_fotografia
 )
-from interfaz import (
-   mostrar_metadatos,
+from .interfaz import (
    mostrar_fechas_exif,
-   mostrar_fecha_seleccionada
+   mostrar_fecha_seleccionada,
+   mostrar_resumen,
+   crear_resumen,
+   actualizar_resumen,
+   registrar_fotografia_copiada
 )
 
-from renombrador import (
+from .renombrador import (
    generar_nombre_disponible,
    copiar_fotografia
 )
@@ -21,9 +24,15 @@ CARPETA_SALIDA = Path(__file__).resolve().parent.parent / "fotos_salida"
 def main():
     fotos = obtener_fotografias(CARPETA_ENTRADA)
 
+    if not CARPETA_ENTRADA.exists():
+       print("La carpeta fotos_entrada no existe.")
+       return
+    
     if not fotos: 
-      print("No hay fotografías en fotos_entrada")
+      print("No hay fotografías en fotos_entrada.")
       return
+    
+    resumen = crear_resumen(len(fotos))
 
     CARPETA_SALIDA.mkdir(exist_ok=True)
 
@@ -42,6 +51,12 @@ def main():
 
       print(f"Estado: {estado}")
 
+      actualizar_resumen(
+         resumen,
+         estado,
+         ruta_foto.name
+      )
+
       if estado == "SIN_EXIF":
         print("\nLa fotografía no contiene metadatos EXIF.")
         print("-" * 60)
@@ -52,13 +67,6 @@ def main():
         print("-" * 60)
         continue
              
-      tiene_exif = resultado["tiene_exif"]
-
-      if not tiene_exif:
-        print("\nLa fotografía no contiene metadatos EXIF.")
-        print("*" * 60)
-        continue
-
       metadatos = resultado["metadatos"]
       fechas = resultado["fechas"]
       fecha = resultado["fecha"]
@@ -82,10 +90,19 @@ def main():
          nombre_nuevo
       )
 
+      registrar_fotografia_copiada(
+         resumen,
+         ruta_foto.name
+      )
+
       print(f"Fotografía copiada: {ruta_destino.name}")
       print(f"Nuevo nombre: {nombre_nuevo}")
 
       print("-/-" * 30)
+
+    mostrar_resumen(resumen)
+
+
 
 if __name__ == "__main__":
     main()

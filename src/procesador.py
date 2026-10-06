@@ -1,24 +1,26 @@
 from pathlib import Path
 
-from metadatos import (
+from .metadatos import (
     leer_exif,
     obtener_fechas_exif,
     obtener_fecha_foto
 )
 
+EXTENSIONES_VALIDAS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".tif",
+    ".tiff",
+}
 
 def obtener_fotografias(carpeta_entrada: Path):
     
     """Obtiene las fotografías disponibles en la carpeta de entrada."""
 
-    extensiones_validas = {
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".tif",
-        ".tiff",
-    }
+    if not carpeta_entrada.exists():
+        return []
 
     fotografias = []
 
@@ -27,7 +29,7 @@ def obtener_fotografias(carpeta_entrada: Path):
         if not archivo.is_file():
             continue
 
-        if archivo.suffix.lower() not in extensiones_validas:
+        if archivo.suffix.lower() not in EXTENSIONES_VALIDAS:
             continue
 
         fotografias.append(archivo)
@@ -45,7 +47,7 @@ def procesar_fotografia(ruta_foto: Path):
             "metadatos":{},
             "fechas": {},
             "fecha": None,
-            "tiene_exif": False,
+            # "tiene_exif": False,
             "estado": "SIN_EXIF"
         }
 
@@ -62,6 +64,6 @@ def procesar_fotografia(ruta_foto: Path):
         "metadatos": metadatos,
         "fechas": fechas,
         "fecha": fecha,
-        "tiene_exif": True,
+        # "tiene_exif": True,
         "estado": estado,
     }
